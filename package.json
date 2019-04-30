@@ -46,6 +46,10 @@
     "webpack-merge": "^4.2.1"
   },
   "dependencies": {
-    "@babel/polyfill": "^7.4.0"
+    "@babel/polyfill": "^7.4.0",
+    "babel-eslint": "^10.0.1",
+    "fullpage.js": "^3.0.5",
+    "gsap": "^2.1.2",
+    "jquery": "^3.4.0"
   }
 }

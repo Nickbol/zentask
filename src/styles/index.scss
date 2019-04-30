@@ -1,5 +1,19 @@
+@import '../../node_modules/fullpage.js/dist/fullpage.css';
+
 $body-color: blue;
 
 body {
   color: $body-color;
+}
+
+.follower {
+  isolation:isolate;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 80px;
+  height: 80px;
+  border-radius: 40px;
+  background: rgba(255, 0, 52, 0.24);
+  transform: translateX(-50%) translateY(-50%);
 }

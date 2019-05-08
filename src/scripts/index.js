@@ -3,91 +3,148 @@ import '../styles/index.scss';
 import $ from 'jquery';
 import * as fullpage from 'fullpage.js/dist/fullpage.min.js';
 import { TweenMax, Expo } from "gsap/TweenMax";
+import debounce from 'debounce';
+
+import { mouseMoveAnimations } from './mouseMoveAnimations';
+import {exitAndEntryAnimations} from './exitAndEntryAnimations';
+
 const initialAnimationState = {
-  inProgress: null,
+  index: null,
+  nextIndex: null,
+  inProgress: false,
   direction: null,
   isDone: false
 };
-let exitAnimation = { ...initialAnimationState };
-let enterAnimation = { ...initialAnimationState };
-let timeoutId;
+// Use one duration for exit animation, animation between slides and entry animation
+const duration = 500;
+let exitAnimation = { ...initialAnimationState },
+  isEntryAnimationInProgress = false,
+  exitAnimationTimeout,
+  screenType,
+  containerWidth,
+  containerHeight;
+
+function defineScreenParams () {
+  const width = window.innerWidth;
+  screenType = width >= 1200 ? 'desktop' : width >= 768 && width < 1200 ? 'tablet' : 'mobile';
+  containerWidth = document.documentElement.clientWidth;
+  containerHeight = document.documentElement.clientHeight;
+}
+
+const debouncedDefineScreenParams = debounce(defineScreenParams, 300);
+
+window.onresize = function() {
+  debouncedDefineScreenParams();
+};
 
 $(document).ready(function() {
+  defineScreenParams();
+
   new fullpage('#landing', {
-    autoScrolling:true,
-    scrollHorizontally: true,
-    onLeave: handleSlideChange,
-    afterSlideLoad: function (section, origin, destination, direction) {
-      debugger;
-      console.log('After slide load');
-    }
+    scrollingSpeed: 0,
+    navigation: true,
+    onLeave: handleSlideChange
   });
 
   $(document).on('mousemove', (event) => {
-    if (exitAnimation.inProgress) {
+    if (exitAnimation.inProgress || isEntryAnimationInProgress) {
       return;
     }
+
+    const offsets = {
+      horizontalOffsetFromCenter: containerWidth/2 - event.pageX,
+      horizontalOffsetFromRight: 0.5 + (containerWidth - event.pageX)/containerWidth
+    };
+
+    const activeSlideNum = fullpage_api.getActiveSection().index + 1;
+    const sectionAnimations = mouseMoveAnimations[`section${activeSlideNum}`];
+
+    sectionAnimations.forEach(item => {
+      const transformString = item.animations.reduce((res, current) => {
+        const dimension = current.type !== 'scale' ? 'px' : '';
+        return res + ` ${current.type}(${offsets[current.reactTo] * current.ratio + dimension})`;
+      }, '');
+      TweenMax.to(
+        $(item.selector),
+        1,
+        {
+          css: { transform: transformString },
+          ease: Expo.easeOut,
+          overwrite: 'all'
+        });
+    });
+  });
+});
+
+function animateExit (index, nextIndex, direction) {
+  if (exitAnimation.inProgress) { return; }
+  const sectionAnimations = exitAndEntryAnimations[`section${index+1}`][screenType][direction];
+  sectionAnimations.forEach(item => {
     TweenMax.to(
-      $('.follower'),
-      1,
+      $(item.selector),
+      duration/1000,
       {
-        css: {
-          left: event.clientX,
-          top: event.clientY,
-        },
+        css: item.style,
         ease: Expo.easeOut,
         overwrite: 'all'
       });
   });
-});
-
-function animateExit (index, direction) {
-  if (exitAnimation.inProgress && direction === exitAnimation.direction) {
-    return;
-  }
-  switch (index) {
-    case 0:
-      if (direction === 'up') {
-
-      } else if (direction === 'down') {
-        TweenMax.to(
-          $('.follower'),
-          1,
-          {
-            css: {
-              left: 500,
-              top: 500,
-            },
-            ease: Expo.easeOut,
-            overwrite: 'all'
-          });
-      }
-      break;
-    default:
-      break;
-  }
-
   exitAnimation = {
     ...exitAnimation,
     inProgress: true,
     direction
   };
 
-  timeoutId && clearTimeout(timeoutId);
-  timeoutId = setTimeout(function() {
+  clearTimeout(exitAnimationTimeout);
+  exitAnimationTimeout = setTimeout(() => {
     exitAnimation.isDone = true;
-    const currentSlideNum = index + 1;
-    const nextSlideNum = direction === 'up'
-      ? currentSlideNum - 1
-      : currentSlideNum + 1;
-    fullpage_api.moveTo(nextSlideNum);
+    exitAnimation.inProgress = false;
+    fullpage_api.moveTo(nextIndex + 1);
+    animateEntry();
+  }, duration);
+}
+
+function animateEntry (isScreenTypeChanged = false) {
+  isEntryAnimationInProgress = true;
+  const entry = exitAnimation.direction === 'down' ? 'up' : 'down';
+  const activeSlideNum = fullpage_api.getActiveSection().index + 1;
+  const centerAnimations = exitAndEntryAnimations[`section${activeSlideNum}`][screenType]['center'];
+
+  if (!isScreenTypeChanged) {
+    const entryAnimations = exitAndEntryAnimations[`section${activeSlideNum}`][screenType][entry];
+    entryAnimations.forEach(item => {
+      TweenMax.to(
+        $(item.selector),
+        0,
+        {
+          css: item.style,
+          ease: Expo.easeOut,
+          overwrite: 'all'
+        });
+    });
+  }
+
+  centerAnimations.forEach(item => {
+    TweenMax.to(
+      $(item.selector),
+      duration/1000,
+      {
+        css: item.style,
+        ease: Expo.easeOut,
+        overwrite: 'all'
+      });
+  });
+
+  setTimeout(() => {
+    isEntryAnimationInProgress = false;
     exitAnimation = { ...initialAnimationState };
-  }, 1000);
+  }, duration)
 }
 
 function handleSlideChange(origin, destination, direction) {
+  console.log('Handle slide change', destination.index);
   if (!exitAnimation.isDone) {
-    animateExit(origin.index, direction);
+    animateExit(origin.index, destination.index, direction);
     return false;
   }
 }

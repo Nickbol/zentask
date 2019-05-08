@@ -6,14 +6,109 @@ body {
   color: $body-color;
 }
 
-.follower {
-  isolation:isolate;
+.section {
+  position: relative;
+  overflow: hidden;
+}
+
+.section-2 {
+  background: #8fc30b;
+}
+.section-3 {
+  background: #ffd700;
+}
+.section-5 {
+  background: black;
+}
+.section-1__item-1 {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 80px;
-  height: 80px;
-  border-radius: 40px;
-  background: rgba(255, 0, 52, 0.24);
-  transform: translateX(-50%) translateY(-50%);
+  z-index: 20;
+  top: 35%;
+  left: 50%;
+  width: 400px;
+  height: 400px;
+  background-image: url(../images/banana.png);
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+.section-1__item-2 {
+  position: absolute;
+  z-index: 10;
+  top: 45%;
+  left: 45%;
+  width: 200px;
+  height: 200px;
+  border-radius: 100px;
+  background-color: #000000;
+}
+.section-2__item-1 {
+  position: absolute;
+  top: 30%;
+  left: 40%;
+  width: 500px;
+  height: 400px;
+  background-image: url(../images/car.png);
+  background-size: contain;
+}
+.section-2__item-2 {
+  position: absolute;
+  top: 70%;
+  left: 50%;
+  width: 200px;
+  height: 5px;
+  background: #fff;
+}
+.section-3__item-1 {
+  position: absolute;
+  top: 40%;
+  left: 40%;
+  width: 200px;
+  height: 200px;
+  border-radius: 200px;
+  background: #fff;
+}
+.section-3__item-2 {
+  position: absolute;
+  top: 60%;
+  left: 60%;
+  width: 100px;
+  height: 100px;
+  border-radius: 0;
+  background: rgba(238, 55, 12, 0.69);
+}
+.section-4__item-1 {
+  position: absolute;
+  top: 40%;
+  left: 40%;
+  width: 200px;
+  height: 200px;
+  border-radius: 200px;
+  border: 1px solid #000;
+}
+.section-4__item-2 {
+  position: absolute;
+  top: 20%;
+  left: 20%;
+  width: 200px;
+  height: 200px;
+  border-radius: 0;
+  background: black;
+}
+.section-5__item-1 {
+  position: absolute;
+  top: 40%;
+  left: 40%;
+  width: 100px;
+  height: 100px;
+  border-radius: 200px;
+  background: #fff;
+}
+.section-5__item-2 {
+  position: absolute;
+  top: 20%;
+  left: 20%;
+  width: 100px;
+  height: 100px;
+  border-radius: 0;
+  background: rgb(238, 217, 57);
 }

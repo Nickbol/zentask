@@ -54,14 +54,14 @@ body {
   position: absolute;
   top: 70%;
   left: 50%;
-  width: 200px;
-  height: 5px;
+  width: 300px;
+  height: 1px;
   background: #fff;
 }
 .section-3__item-1 {
   position: absolute;
   top: 40%;
-  left: 40%;
+  left: 60%;
   width: 200px;
   height: 200px;
   border-radius: 200px;
@@ -73,8 +73,8 @@ body {
   left: 60%;
   width: 100px;
   height: 100px;
-  border-radius: 0;
-  background: rgba(238, 55, 12, 0.69);
+  background: #FFD700;
+  border: 1px solid #fff;
 }
 .section-4__item-1 {
   position: absolute;
@@ -105,8 +105,8 @@ body {
 }
 .section-5__item-2 {
   position: absolute;
-  top: 20%;
-  left: 20%;
+  top: 50%;
+  left: 40%;
   width: 100px;
   height: 100px;
   border-radius: 0;

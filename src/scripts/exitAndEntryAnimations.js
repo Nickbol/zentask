@@ -297,7 +297,7 @@ export const exitAndEntryAnimations = {
         {
           selector: '.section-5__item-2',
           style: {
-            top: '20%'
+            top: '50%'
           }
         }
       ],

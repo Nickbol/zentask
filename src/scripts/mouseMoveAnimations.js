@@ -55,7 +55,7 @@ export const mouseMoveAnimations = {
         {
           type: 'translateX',
           reactTo: 'horizontalOffsetFromCenter',
-          ratio: 0.5
+          ratio: 0.2
         }
       ]
     },
@@ -65,7 +65,7 @@ export const mouseMoveAnimations = {
         {
           type: 'translateY',
           reactTo: 'horizontalOffsetFromCenter',
-          ratio: 0.1
+          ratio: -0.1
         }
       ]
     }

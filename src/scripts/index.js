@@ -8,6 +8,9 @@ import debounce from 'debounce';
 import { mouseMoveAnimations } from './mouseMoveAnimations';
 import {exitAndEntryAnimations} from './exitAndEntryAnimations';
 
+// Use one duration for exit and entry animation
+const duration = 1000;
+
 const initialAnimationState = {
   index: null,
   nextIndex: null,
@@ -15,8 +18,7 @@ const initialAnimationState = {
   direction: null,
   isDone: false
 };
-// Use one duration for exit animation, animation between slides and entry animation
-const duration = 500;
+
 let exitAnimation = { ...initialAnimationState },
   isEntryAnimationInProgress = false,
   exitAnimationTimeout,
@@ -77,7 +79,6 @@ $(document).ready(function() {
 });
 
 function animateExit (index, nextIndex, direction) {
-  if (exitAnimation.inProgress) { return; }
   const sectionAnimations = exitAndEntryAnimations[`section${index+1}`][screenType][direction];
   sectionAnimations.forEach(item => {
     TweenMax.to(
@@ -104,14 +105,13 @@ function animateExit (index, nextIndex, direction) {
   }, duration);
 }
 
-function animateEntry (isScreenTypeChanged = false) {
+function animateEntry (repeatOnScreenTypeChange = false) {
   isEntryAnimationInProgress = true;
-  const entry = exitAnimation.direction === 'down' ? 'up' : 'down';
+  const entryDirection = exitAnimation.direction === 'down' ? 'up' : 'down';
   const activeSlideNum = fullpage_api.getActiveSection().index + 1;
-  const centerAnimations = exitAndEntryAnimations[`section${activeSlideNum}`][screenType]['center'];
 
-  if (!isScreenTypeChanged) {
-    const entryAnimations = exitAndEntryAnimations[`section${activeSlideNum}`][screenType][entry];
+  if (!repeatOnScreenTypeChange) {
+    const entryAnimations = exitAndEntryAnimations[`section${activeSlideNum}`][screenType][entryDirection];
     entryAnimations.forEach(item => {
       TweenMax.to(
         $(item.selector),
@@ -124,6 +124,7 @@ function animateEntry (isScreenTypeChanged = false) {
     });
   }
 
+  const centerAnimations = exitAndEntryAnimations[`section${activeSlideNum}`][screenType]['center'];
   centerAnimations.forEach(item => {
     TweenMax.to(
       $(item.selector),
@@ -143,6 +144,9 @@ function animateEntry (isScreenTypeChanged = false) {
 
 function handleSlideChange(origin, destination, direction) {
   console.log('Handle slide change', destination.index);
+  if (exitAnimation.inProgress || isEntryAnimationInProgress) {
+    return false;
+  }
   if (!exitAnimation.isDone) {
     animateExit(origin.index, destination.index, direction);
     return false;

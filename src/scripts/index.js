@@ -9,47 +9,55 @@ import { mouseMoveAnimations } from './mouseMoveAnimations';
 import {exitAndEntryAnimations} from './exitAndEntryAnimations';
 
 // Use one duration for exit and entry animation
-const duration = 1000;
+const duration = 2500;
 
 const initialAnimationState = {
   index: null,
   nextIndex: null,
-  inProgress: false,
   direction: null,
+  isInProgress: false,
   isDone: false
 };
 
 let exitAnimation = { ...initialAnimationState },
   isEntryAnimationInProgress = false,
   exitAnimationTimeout,
+  entryAnimationTimeout,
   screenType,
   containerWidth,
-  containerHeight;
+  containerHeight,
+  isScrolledToBottom = false;
 
 function defineScreenParams () {
+  const previousScreenType = screenType;
   const width = window.innerWidth;
   screenType = width >= 1200 ? 'desktop' : width >= 768 && width < 1200 ? 'tablet' : 'mobile';
   containerWidth = document.documentElement.clientWidth;
   containerHeight = document.documentElement.clientHeight;
+  if (previousScreenType && screenType !== previousScreenType) {
+    console.log('Screen type changed', screenType);
+    repeatAnimation();
+  }
 }
 
 const debouncedDefineScreenParams = debounce(defineScreenParams, 300);
 
-window.onresize = function() {
+window.onresize = function () {
   debouncedDefineScreenParams();
 };
 
-$(document).ready(function() {
+$(document).ready(function () {
   defineScreenParams();
 
   new fullpage('#landing', {
     scrollingSpeed: 0,
     navigation: true,
+    loopBottom: true,
     onLeave: handleSlideChange
   });
 
   $(document).on('mousemove', (event) => {
-    if (exitAnimation.inProgress || isEntryAnimationInProgress) {
+    if (exitAnimation.isInProgress || isEntryAnimationInProgress || screenType !== 'desktop') {
       return;
     }
 
@@ -79,8 +87,16 @@ $(document).ready(function() {
 });
 
 function animateExit (index, nextIndex, direction) {
-  const sectionAnimations = exitAndEntryAnimations[`section${index+1}`][screenType][direction];
-  sectionAnimations.forEach(item => {
+  exitAnimation = {
+    ...exitAnimation,
+    isInProgress: true,
+    index,
+    nextIndex,
+    direction
+  };
+
+  const sectionAnimations = (exitAndEntryAnimations[`section${index + 1}`][screenType] || {})[direction];
+  (sectionAnimations || []).forEach(item => {
     TweenMax.to(
       $(item.selector),
       duration/1000,
@@ -90,19 +106,22 @@ function animateExit (index, nextIndex, direction) {
         overwrite: 'all'
       });
   });
-  exitAnimation = {
-    ...exitAnimation,
-    inProgress: true,
-    direction
-  };
 
   clearTimeout(exitAnimationTimeout);
-  exitAnimationTimeout = setTimeout(() => {
-    exitAnimation.isDone = true;
-    exitAnimation.inProgress = false;
-    fullpage_api.moveTo(nextIndex + 1);
-    animateEntry();
-  }, duration);
+  if (nextIndex !== null) {
+    exitAnimationTimeout = setTimeout(() => {
+      exitAnimation.isDone = true;
+      exitAnimation.isInProgress = false;
+      fullpage_api.moveTo(nextIndex + 1);
+      animateEntry();
+    }, duration);
+  } else {
+    exitAnimationTimeout = setTimeout(() => {
+      exitAnimation = { ...initialAnimationState };
+      isScrolledToBottom = true;
+    }, duration);
+  }
+
 }
 
 function animateEntry (repeatOnScreenTypeChange = false) {
@@ -111,8 +130,8 @@ function animateEntry (repeatOnScreenTypeChange = false) {
   const activeSlideNum = fullpage_api.getActiveSection().index + 1;
 
   if (!repeatOnScreenTypeChange) {
-    const entryAnimations = exitAndEntryAnimations[`section${activeSlideNum}`][screenType][entryDirection];
-    entryAnimations.forEach(item => {
+    const entryAnimations = (exitAndEntryAnimations[`section${activeSlideNum}`][screenType] || {})[entryDirection];
+    (entryAnimations || []).forEach(item => {
       TweenMax.to(
         $(item.selector),
         0,
@@ -124,8 +143,8 @@ function animateEntry (repeatOnScreenTypeChange = false) {
     });
   }
 
-  const centerAnimations = exitAndEntryAnimations[`section${activeSlideNum}`][screenType]['center'];
-  centerAnimations.forEach(item => {
+  const centerAnimations = (exitAndEntryAnimations[`section${activeSlideNum}`][screenType] || {})['center'];
+  (centerAnimations || []).forEach(item => {
     TweenMax.to(
       $(item.selector),
       duration/1000,
@@ -136,17 +155,45 @@ function animateEntry (repeatOnScreenTypeChange = false) {
       });
   });
 
-  setTimeout(() => {
+  clearTimeout(entryAnimationTimeout);
+  entryAnimationTimeout = setTimeout(() => {
     isEntryAnimationInProgress = false;
     exitAnimation = { ...initialAnimationState };
-  }, duration)
+  }, duration);
+}
+
+function repeatAnimation () {
+  const { index, nextIndex, direction } = exitAnimation;
+
+  if (exitAnimation.isInProgress) {
+    animateExit(index, nextIndex, direction);
+  }
+  if (isEntryAnimationInProgress) {
+    animateEntry(true);
+  }
 }
 
 function handleSlideChange(origin, destination, direction) {
   console.log('Handle slide change', destination.index);
-  if (exitAnimation.inProgress || isEntryAnimationInProgress) {
+
+  const length = $('.section').length;
+  const currentIndex = fullpage_api.getActiveSection().index;
+  const isLastSection = currentIndex === length - 1;
+
+  if (exitAnimation.isInProgress || isEntryAnimationInProgress) {
     return false;
   }
+
+  if (isLastSection && direction === 'down') {
+    if (!isScrolledToBottom) {
+      animateExit(origin.index, null, direction);
+      return false;
+    } else {
+      return false;
+    }
+  }
+
+
   if (!exitAnimation.isDone) {
     animateExit(origin.index, destination.index, direction);
     return false;

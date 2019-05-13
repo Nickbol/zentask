@@ -303,21 +303,15 @@ export const exitAndEntryAnimations = {
       ],
       down: [
         {
-          selector: '.section-5',
-          style: {
-            opacity: 0
-          }
-        },
-        {
           selector: '.section-5__item-1',
           style: {
-            top: '0px'
+            top: '80%'
           }
         },
         {
           selector: '.section-5__item-2',
           style: {
-            top: '0px'
+            top: '80%'
           }
         }
       ]

@@ -123,7 +123,6 @@ export default {
       {
         selector: '.section-5__circle-3',
         style: {
-          margin: '0 -75px -500px 0',
           transform: 'scaleX(20)',
           opacity: 1
         }

@@ -1,0 +1,39 @@
+@font-face{
+  font-family: 'SeravekRegular';
+  src: url('../fonts/seravek-regular/Seravek-Regular.eot');
+  src: url('../fonts/seravek-regular/Seravek-Regular.eot?iefix') format('embedded-opentype'),
+  url('../fonts/seravek-regular/Seravek-Regular.woff') format('woff'),
+  url('../fonts/seravek-regular/Seravek-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face{
+  font-family: 'SfProText';
+  src: url('../fonts/sf-pro-text-light/Sf-Pro-Text-Light.eot');
+  src: url('../fonts/sf-pro-text-light/Sf-Pro-Text-Light.eot?iefix') format('embedded-opentype'),
+  url('../fonts/sf-pro-text-light/Sf-Pro-Text-Light.woff') format('woff'),
+  url('../fonts/sf-pro-text-light/Sf-Pro-Text-Light.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face{
+  font-family: 'SfProText';
+  src: url('../fonts/sf-pro-text-regular/Sf-Pro-Text-Regular.eot');
+  src: url('../fonts/sf-pro-text-regular/Sf-Pro-Text-Regular.eot?iefix') format('embedded-opentype'),
+  url('../fonts/sf-pro-text-regular/Sf-Pro-Text-Regular.woff') format('woff'),
+  url('../fonts/sf-pro-text-regular/Sf-Pro-Text-Regular.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face{
+  font-family: 'SfProText';
+  src: url('../fonts/sf-pro-text-medium/Sf-Pro-Text-Medium.eot');
+  src: url('../fonts/sf-pro-text-medium/Sf-Pro-Text-Medium.eot?iefix') format('embedded-opentype'),
+  url('../fonts/sf-pro-text-medium/Sf-Pro-Text-Medium.woff') format('woff'),
+  url('../fonts/sf-pro-text-medium/Sf-Pro-Text-Medium.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+}

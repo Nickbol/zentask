@@ -5,11 +5,10 @@ import * as fullpage from 'fullpage.js/dist/fullpage.min.js';
 import { TweenMax, Expo } from "gsap/TweenMax";
 import debounce from 'debounce';
 
-import { mouseMoveAnimations } from './mouseMoveAnimations';
-import {exitAndEntryAnimations} from './exitAndEntryAnimations';
+import animations from './animations';
 
 // Use one duration for exit and entry animation
-const duration = 2500;
+const duration = 1000;
 
 const initialAnimationState = {
   index: null,
@@ -35,7 +34,6 @@ function defineScreenParams () {
   containerWidth = document.documentElement.clientWidth;
   containerHeight = document.documentElement.clientHeight;
   if (previousScreenType && screenType !== previousScreenType) {
-    console.log('Screen type changed', screenType);
     repeatAnimation();
   }
 }
@@ -48,13 +46,18 @@ window.onresize = function () {
 
 $(document).ready(function () {
   defineScreenParams();
+  $('#landing').fadeIn(1000);
+  $('.main-logo').fadeIn(1000);
 
   new fullpage('#landing', {
     scrollingSpeed: 0,
     navigation: true,
+    navigationPosition: 'left',
     loopBottom: true,
     onLeave: handleSlideChange
   });
+
+  animateEntry();
 
   $(document).on('mousemove', (event) => {
     if (exitAnimation.isInProgress || isEntryAnimationInProgress || screenType !== 'desktop') {
@@ -67,16 +70,16 @@ $(document).ready(function () {
     };
 
     const activeSlideNum = fullpage_api.getActiveSection().index + 1;
-    const sectionAnimations = mouseMoveAnimations[`section${activeSlideNum}`];
+    const sectionAnimations = animations.mouseMove[`section${activeSlideNum}`];
 
     sectionAnimations.forEach(item => {
       const transformString = item.animations.reduce((res, current) => {
-        const dimension = current.type !== 'scale' ? 'px' : '';
+        const dimension = !current.type.includes('scale') ? 'px' : '';
         return res + ` ${current.type}(${offsets[current.reactTo] * current.ratio + dimension})`;
       }, '');
       TweenMax.to(
         $(item.selector),
-        1,
+        3,
         {
           css: { transform: transformString },
           ease: Expo.easeOut,
@@ -95,14 +98,14 @@ function animateExit (index, nextIndex, direction) {
     direction
   };
 
-  const sectionAnimations = (exitAndEntryAnimations[`section${index + 1}`][screenType] || {})[direction];
+  const sectionAnimations = (animations.exitAndEntry[`section${index + 1}`][screenType] || {})[direction];
   (sectionAnimations || []).forEach(item => {
     TweenMax.to(
       $(item.selector),
       duration/1000,
       {
         css: item.style,
-        ease: Expo.easeOut,
+        ease: Expo.easeInOut,
         overwrite: 'all'
       });
   });
@@ -126,11 +129,18 @@ function animateExit (index, nextIndex, direction) {
 
 function animateEntry (repeatOnScreenTypeChange = false) {
   isEntryAnimationInProgress = true;
-  const entryDirection = exitAnimation.direction === 'down' ? 'up' : 'down';
+  let entryDirection;
+  if (exitAnimation.direction) {
+    entryDirection = exitAnimation.direction === 'down' ? 'up' : 'down';
+  } else {
+    // Occurs when the page loads (entry on the first slide)
+    entryDirection = 'down';
+  }
+
   const activeSlideNum = fullpage_api.getActiveSection().index + 1;
 
   if (!repeatOnScreenTypeChange) {
-    const entryAnimations = (exitAndEntryAnimations[`section${activeSlideNum}`][screenType] || {})[entryDirection];
+    const entryAnimations = (animations.exitAndEntry[`section${activeSlideNum}`][screenType] || {})[entryDirection];
     (entryAnimations || []).forEach(item => {
       TweenMax.to(
         $(item.selector),
@@ -143,14 +153,14 @@ function animateEntry (repeatOnScreenTypeChange = false) {
     });
   }
 
-  const centerAnimations = (exitAndEntryAnimations[`section${activeSlideNum}`][screenType] || {})['center'];
+  const centerAnimations = (animations.exitAndEntry[`section${activeSlideNum}`][screenType] || {})['center'];
   (centerAnimations || []).forEach(item => {
     TweenMax.to(
       $(item.selector),
       duration/1000,
       {
         css: item.style,
-        ease: Expo.easeOut,
+        ease: Expo.easeInOut,
         overwrite: 'all'
       });
   });
@@ -174,11 +184,7 @@ function repeatAnimation () {
 }
 
 function handleSlideChange(origin, destination, direction) {
-  console.log('Handle slide change', destination.index);
-
-  const length = $('.section').length;
-  const currentIndex = fullpage_api.getActiveSection().index;
-  const isLastSection = currentIndex === length - 1;
+  const isLastSection = origin.index === $('.section').length - 1;
 
   if (exitAnimation.isInProgress || isEntryAnimationInProgress) {
     return false;
@@ -193,9 +199,9 @@ function handleSlideChange(origin, destination, direction) {
     }
   }
 
-
   if (!exitAnimation.isDone) {
     animateExit(origin.index, destination.index, direction);
+    isScrolledToBottom = false;
     return false;
   }
 }

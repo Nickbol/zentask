@@ -28,18 +28,6 @@ export default {
           transform: 'translateY(20px)',
           opacity: 0
         }
-      },
-      {
-        selector: '.section-4__fly-1',
-        style: {
-          opacity: 0
-        }
-      },
-      {
-        selector: '.section-4__fly-2',
-        style: {
-          opacity: 0
-        }
       }
     ],
     center: [
@@ -77,18 +65,6 @@ export default {
           transform: 'translateY(0)',
           opacity: 1
         }
-      },
-      {
-        selector: '.section-4__fly-1',
-        style: {
-          opacity: .6
-        }
-      },
-      {
-        selector: '.section-4__fly-2',
-        style: {
-          opacity: .15
-        }
       }
     ],
     down: [
@@ -96,18 +72,6 @@ export default {
         selector: '.section-4__content',
         style: {
           transform: 'translateY(-30%)',
-          opacity: 0
-        }
-      },
-      {
-        selector: '.section-4__fly-1',
-        style: {
-          opacity: 0
-        }
-      },
-      {
-        selector: '.section-4__fly-2',
-        style: {
           opacity: 0
         }
       }

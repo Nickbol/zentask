@@ -48,12 +48,19 @@ ul {
   }
 }
 
-.main-logo {
+.header {
   position: fixed;
-  z-index: 2000;
-  top: 30px;
-  left: 50%;
-  margin-left: -600px;
+  z-index: 3000;
+  width: 1300px;
+  margin: 0 auto;
+  padding: 15px 15px 0;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+.main-logo {
+  display: block;
   width: 100px;
   transition: transform .2s;
   img {
@@ -108,7 +115,7 @@ ul {
     z-index: 1000;
     max-width: 1300px;
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
   }
   &__left {
     position: relative;
@@ -308,28 +315,6 @@ ul {
     justify-content: center;
     max-width: 430px;
     padding-left: 50px;
-  }
-  &__fly-1 {
-    position: absolute;
-    right: 50%;
-    bottom: 50%;
-    margin: 0 -320px 250px 0;
-    width: 8px;
-    height: 8px;
-    border-radius: 10px;
-    background: #fff;
-    box-shadow: 0 1px 6px 4px #fff;
-  }
-  &__fly-2 {
-    position: absolute;
-    right: 50%;
-    bottom: 50%;
-    margin: 0 -120px -260px 0;
-    width: 25px;
-    height: 25px;
-    border-radius: 50px;
-    background: #67ACF1;
-    box-shadow: 0 0px 10px 10px #67ACF1;
   }
 }
 
